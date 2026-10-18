@@ -7,13 +7,14 @@ LAKE  ?= lake
 BIN   := .lake/build/bin
 
 # Bare `lake build` builds only the library, so the executables are named.
-EXES := tessera-test tessera-vterm tessera-demo tessera-bench
+EXES := tessera-test tessera-vterm tessera-demo
 
 # Extra LeanBench flags, e.g. `make bench BENCH_ARGS='--match diff --samples 5'`.
 BENCH_ARGS ?=
 
 # Quiet: otherwise Lake replays LeanBench's missing-docstring warnings on every run.
-BENCH := $(LAKE) -q --log-level=error exe tessera-bench
+# The benchmarks are their own Lake project in bench/, so the library does not depend on LeanBench.
+BENCH := cd bench && $(LAKE) -q --log-level=error exe tessera-bench
 
 .DEFAULT_GOAL := help
 

@@ -11,7 +11,9 @@ import LeanBench
 
 Inputs are read from refs so the compiler cannot hoist the work out of the timed action. -/
 
-namespace Tessera.Bench.Text
+namespace TesseraBench.Text
+
+open Tessera
 
 private abbrev CS : Charset := .standard
 
@@ -51,4 +53,4 @@ def benches : IO (Array LeanBench.Bench) := do
                     action := do out.set (Untrusted.pasted (← p.get)).text }
   pure bs
 
-end Tessera.Bench.Text
+end TesseraBench.Text

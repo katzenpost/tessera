@@ -11,7 +11,9 @@ import LeanBench
 
 Inputs are read from refs so the compiler cannot hoist the work out of the timed action. -/
 
-namespace Tessera.Bench.Draw
+namespace TesseraBench.Draw
+
+open Tessera
 
 open Widget
 
@@ -53,4 +55,4 @@ def benches : IO (Array LeanBench.Bench) := do
                     action := do let (_, n, _) ← bufs.get; out.set (redraw n) }
   pure bs
 
-end Tessera.Bench.Draw
+end TesseraBench.Draw
