@@ -18,6 +18,9 @@ jobs:
           lint: false
       - name: Build, check the proofs and run the tests
         run: make ci
+      - name: Build the benchmarks (their own Lake project)
+        working-directory: bench
+        run: lake build
 
   vterm:
     runs-on: ubuntu-latest
