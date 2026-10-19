@@ -151,6 +151,7 @@ def tests : TestM Unit := do
   checkEq "marks are capped" 1 ((line (cs := CS) ("e" ++ String.ofList (List.replicate 9 '́'))).text.toList.filter (· == '␦')).length
   checkEq "paste markers go" "ab" (pasted "a\x1b[201~b\x1b[200~").text
   checkEq "a marker hidden in a marker goes too" "[201~" (pasted "\x1b[2\x1b[201~01~").text
+  checkEq "a paste's CR and CRLF are newlines" "a\nb\nc\n" (pasted "a\rb\r\nc\r").text
   check "no control character becomes a glyph"
     ((List.range 0xA0).all fun n => n ≥ 0x20 && n != 0x7F && n < 0x80 ||
       (Glyph.ofChar? (Char.ofNat n) : Option (Glyph CS)).isNone)

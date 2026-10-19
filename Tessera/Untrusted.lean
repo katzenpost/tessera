@@ -101,8 +101,9 @@ structure Pasted where
   noMarkers : ¬ pasteStart.toList <:+: text.toList ∧ ¬ pasteEnd.toList <:+: text.toList
 
 /-- A paste without its markers and without ESC, which only a marker or an escape sequence
-would begin with. -/
+would begin with, its line breaks as newlines: tmux and some terminals paste them as CR or CRLF. -/
 def pasted (s : String) : Pasted :=
+  let s := (s.replace "\r\n" "\n").replace "\r" "\n"
   let l := ((s.replace pasteStart "").replace pasteEnd "").toList.filter (· != '\x1b')
   have noEsc : '\x1b' ∉ l := by simp [l]
   have hesc : ∀ m : String, '\x1b' ∈ m.toList → ¬ m.toList <:+: l := fun _ hm hi =>

@@ -102,7 +102,7 @@ An `Ident` is a `Text` for names: nicknames, room names, file names. A `Text` al
 ### Text passed on
 
 Two functions produce strings rather than `Text`, for text that leaves Tessera instead of reaching the screen:
-- `Untrusted.pasted` returns a `Pasted`: a paste with a proof that it contains neither of bracketed paste's markers. It removes the markers and then every ESC, so a marker hidden inside another, which reappears when the outer one is removed, goes too.
+- `Untrusted.pasted` returns a `Pasted`: a paste with a proof that it contains neither of bracketed paste's markers. It removes the markers and then every ESC, so a marker hidden inside another, which reappears when the outer one is removed, goes too. It takes a CR or CRLF as a newline, since tmux and some terminals paste line breaks that way.
 - `withoutControls` returns a string with a proof that it contains no controls other than newline and tab, and no bidi controls. It is meant for a message about to be sent.
 
 ## Cells and buffers
