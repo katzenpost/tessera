@@ -5,6 +5,10 @@ Terminal user interfaces in Lean 4. Its widgets and box layout are inspired by H
 with a function that draws it and a function that updates it for each message. Terminal input and
 control come from [crossterm-lean-ffi](https://github.com/katzenpost/crossterm-lean-ffi).
 
+A group chat over the Katzenpost mixnet, written with Tessera:
+
+![A group chat drawn by Tessera: three groups and four members, talking over a mixnet](docs/screenshot.png)
+
 ```lean
 import Tessera
 open Tessera Widget
