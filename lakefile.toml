@@ -1,5 +1,5 @@
 name = "Tessera"
-version = "0.1.0"
+version = "0.2.0"
 description = "Terminal user interfaces in Lean 4"
 keywords = ["tui", "terminal", "ui", "security"]
 license = "AGPL-3.0-only"
@@ -12,7 +12,7 @@ relaxedAutoImplicit = false
 [[require]]
 name = "crossterm-lean-ffi"
 git = "https://github.com/katzenpost/crossterm-lean-ffi"
-rev = "8488514aa9de05ed5d59506b2df25b7bdfa26b44"
+rev = "d770b438c00609ee987af524f390e90e49f09820"
 
 [[lean_lib]]
 name = "Tessera"

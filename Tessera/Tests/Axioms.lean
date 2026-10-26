@@ -81,7 +81,7 @@ open Tessera Untrusted
 /-- info: 'Tessera.Roster.build' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in #print axioms Roster.build
 
-/-- info: 'Tessera.Style.reserved_downgrade' depends on axioms: [propext] -/
+/-- info: 'Tessera.Style.reserved_downgrade' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in #print axioms Style.reserved_downgrade
 
 /-- info: 'Tessera.Buffer.mapStyle' depends on axioms: [propext, Quot.sound] -/
