@@ -1,5 +1,5 @@
 name = "Tessera"
-version = "0.2.0"
+version = "0.3.0"
 description = "Terminal user interfaces in Lean 4"
 keywords = ["tui", "terminal", "ui", "security"]
 license = "AGPL-3.0-only"

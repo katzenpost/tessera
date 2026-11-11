@@ -49,7 +49,8 @@ structure Charset where
 `Printable` is an allowlist. A character is in it only when it is not a control or format character and Tessera and terminals agree on its width. `Charset.standard` holds:
 - the scripts and symbols terminals draw one cell wide;
 - the East Asian wide and fullwidth characters, and emoji drawn as pictures, which take two cells, except those that terminals with older width tables draw as one: the emoji and syllables added in Unicode 13 and later, and code points not yet assigned in wide blocks;
-- East Asian ambiguous-width characters, as one cell.
+- East Asian ambiguous-width characters, as one cell;
+- the Block Elements, U+2580 to U+259F, which only text the program wrote may hold (`AppOnly`).
 
 `Charset.cjk` takes the ambiguous-width characters as two cells, as terminals in CJK locales draw them.
 
@@ -86,7 +87,7 @@ A `Text` is one line that may be drawn. Its proof fields hold at two levels:
 - **`seqOk`** checks the combining accents: each follows a character, at most `maxMarks` in a row. A text therefore never begins with an accent, so `++` cannot attach one text's accents to the end of another. `marksOk_append` shows that the concatenation of two texts satisfies `seqOk` with no repair at the join.
 
 The constructor is private, and a `Text` comes from one of these:
-- **`Untrusted.line`** filters a string from elsewhere. It keeps the characters the charset allows and replaces every other one with a visible stand-in: a control character becomes its Control Picture (`␛` for ESC), DEL becomes `␡`, and anything else refused becomes `␦`. An accent with no character before it becomes `␦`. One accent too many on a character becomes `␦`, and the rest are dropped. The result has origin `.remote`. Three theorems hold of it: `filterChars_charsOk` and `filterChars_marksOk` give its proof fields, and `line_sub` says that each of its characters is one of the input or a stand-in.
+- **`Untrusted.line`** filters a string from elsewhere. It keeps the characters the charset allows, other than the `AppOnly` Block Elements, and replaces every other one with a visible stand-in: a control character becomes its Control Picture (`␛` for ESC), DEL becomes `␡`, and anything else refused becomes `␦`. An accent with no character before it becomes `␦`. One accent too many on a character becomes `␦`, and the rest are dropped. The result has origin `.remote`. Four theorems hold of it: `filterChars_charsOk` and `filterChars_marksOk` give its proof fields, `line_sub` says that each of its characters is one of the input or a stand-in, and `line_not_appOnly` that none is a Block Element.
 - **`Untrusted.lines`** splits a text into such lines, expanding tabs. It returns at most `max 1 maxLines` of them, the last saying how many more there were.
 - **`t!"…"`** makes a `Text cs .app` from a string literal, with a proof checked by `decide` when the program compiles. For a charset known then, every character must be one it allows. For a charset that is only a parameter, every character must be printable ASCII. A literal containing a control character does not compile.
 - **`Text.ofNat`** gives the digits of a number, and **`++`** joins two texts of one origin.

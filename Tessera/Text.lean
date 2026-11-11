@@ -19,7 +19,8 @@ elsewhere and shows each character it refuses as a visible stand-in; from a lite
 
 Its origin says where it came from: `.app` for text the program wrote, `.remote` for text from
 elsewhere. Text the program wrote may be used wherever text from elsewhere may, never the
-reverse. -/
+reverse. Only text the program wrote may hold `AppOnly` characters, the Block Elements: `t!`
+allows them and `Untrusted.line` refuses them. -/
 
 namespace Tessera
 
@@ -328,17 +329,28 @@ def filterChars (cs : Charset) (cap : Nat) : Bool → Nat → List Char → List
       if base && decide (k < cap) then c :: filterChars cs cap base (k + 1) r
       else if !base || k == cap then substitute :: filterChars cs cap base (k + 1) r
       else filterChars cs cap base (k + 1) r
-    else if cs.Printable c then c :: filterChars cs cap true 0 r
+    else if cs.Printable c ∧ ¬ AppOnly c then c :: filterChars cs cap true 0 r
     else standIn c :: filterChars cs cap false 0 r
 
+theorem controlPicture_not_appOnly {c : Char} (h : IsControlPicture c) : ¬ AppOnly c := by
+  simp only [IsControlPicture] at h
+  simp [AppOnly, inRanges, appOnlyRanges]; omega
+
+theorem combining_not_appOnly {c : Char} (h : Combining c) : ¬ AppOnly c := by
+  simp only [Combining] at h
+  simp [AppOnly, inRanges, appOnlyRanges]; omega
+
+/-- Each character kept is one `cs` allows and not `AppOnly`, or a combining accent. -/
 theorem filterChars_charsOk (cs : Charset) (cap : Nat) (base : Bool) (k : Nat) (l : List Char) :
-    ∀ c ∈ filterChars cs cap base k l, cs.Printable c ∨ Combining c := by
+    ∀ c ∈ filterChars cs cap base k l, (cs.Printable c ∧ ¬ AppOnly c) ∨ Combining c := by
   induction l generalizing base k with
   | nil => simp [filterChars]
   | cons c r ih =>
-    have hsub : cs.Printable substitute := cs.printable_of_controlPicture (by decide) (by decide)
-    have hstand : cs.Printable (standIn c) :=
-      cs.printable_of_controlPicture (standIn_controlPicture c).1 (standIn_controlPicture c).2
+    have hsub : cs.Printable substitute ∧ ¬ AppOnly substitute :=
+      ⟨cs.printable_of_controlPicture (by decide) (by decide), by decide⟩
+    have hstand : cs.Printable (standIn c) ∧ ¬ AppOnly (standIn c) :=
+      ⟨cs.printable_of_controlPicture (standIn_controlPicture c).1 (standIn_controlPicture c).2,
+        controlPicture_not_appOnly (standIn_controlPicture c)⟩
     intro x hx
     simp only [filterChars] at hx
     split at hx
@@ -446,14 +458,15 @@ theorem filterChars_marksOk (cs : Charset) (cap : Nat) (hcap : cap ≤ maxMarks)
       · exact reset (controlPicture_not_combining (standIn_controlPicture c))
           (ih _ _ _ (.inr (.inr ⟨rfl, .inr rfl⟩)))
 
-/-- One line, filtered: each character `cs` allows is kept, and each it refuses shows as its
-stand-in, so that an attempt to steer the terminal shows. A combining accent is kept on the
+/-- One line, filtered: each character `cs` allows, other than `AppOnly` ones, is kept, and each
+other shows as its stand-in, so that an attempt to steer the terminal shows. A combining accent
+is kept on the
 character before it, up to `p.maxMarks` of them; one more shows as `␦` and the rest go. A newline
 shows as `␊`. -/
 def line (s : String) (p : Policy := {}) : Text cs .remote :=
   let cap := min p.maxMarks maxMarks
   ⟨String.ofList (filterChars cs cap false 0 s.toList),
-    by simpa using filterChars_charsOk cs cap false 0 s.toList,
+    by simpa using fun c hc => (filterChars_charsOk cs cap false 0 s.toList c hc).imp_left (·.1),
     by simpa using (filterChars_marksOk cs cap (Nat.min_le_right _ _) s.toList false 0 none
       (.inr (.inr ⟨rfl, .inl rfl⟩)))⟩
 
@@ -470,6 +483,12 @@ theorem filterChars_length_le (cs : Charset) (cap : Nat) (base : Bool) (k : Nat)
         · simpa using ih _ _
         · exact Nat.le_succ_of_le (ih _ _)
     · split <;> simpa using ih _ _
+
+/-- Text from elsewhere holds no `AppOnly` character: only text the program wrote may. -/
+theorem line_not_appOnly (s : String) (p : Policy) :
+    ∀ c ∈ (line (cs := cs) s p).text.toList, ¬ AppOnly c := fun c hc => by
+  simp only [line, String.toList_ofList] at hc
+  exact (filterChars_charsOk cs _ false 0 s.toList c hc).elim (·.2) combining_not_appOnly
 
 /-- Filtering never lengthens a text: one character in gives at most one out. -/
 theorem line_length_le (s : String) (p : Policy) : (line (cs := cs) s p).text.length ≤ s.length := by

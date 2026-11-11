@@ -141,7 +141,16 @@ def narrowRanges : List (Nat × Nat) :=
 
 def narrow (n : Nat) : Bool := inRanges n narrowRanges
 
-/-- East Asian ambiguous-width characters among those `narrow` keeps, from Unicode 15.1's
+/-- Block Elements, which programs draw pictures with, such as QR codes. Only text the program
+wrote may hold them: `Untrusted.line` refuses them, so that text from elsewhere cannot draw what
+looks like the program's own pictures. -/
+def appOnlyRanges : List (Nat × Nat) := [(0x2580, 0x259F)]
+
+def AppOnly (c : Char) : Prop := inRanges c.toNat appOnlyRanges = true
+
+instance : DecidablePred AppOnly := fun _ => inferInstanceAs (Decidable (_ = true))
+
+/-- East Asian ambiguous-width characters among those `narrow` and `appOnlyRanges` keep, from Unicode 15.1's
 `EastAsianWidth.txt`. Terminals in CJK locales draw them two cells wide. -/
 def ambiguousRanges : List (Nat × Nat) :=
   [(0xA1, 0xA1), (0xA4, 0xA4), (0xA7, 0xA8), (0xAA, 0xAA), (0xAE, 0xAE), (0xB0, 0xB4),
@@ -167,15 +176,16 @@ def ambiguousRanges : List (Nat × Nat) :=
    (0x2227, 0x222C), (0x222E, 0x222E), (0x2234, 0x2237), (0x223C, 0x223D), (0x2248, 0x2248),
    (0x224C, 0x224C), (0x2252, 0x2252), (0x2260, 0x2261), (0x2264, 0x2267), (0x226A, 0x226B),
    (0x226E, 0x226F), (0x2282, 0x2283), (0x2286, 0x2287), (0x2295, 0x2295), (0x2299, 0x2299),
-   (0x22A5, 0x22A5), (0x22BF, 0x22BF), (0x2500, 0x254B), (0x2550, 0x2573)]
+   (0x22A5, 0x22A5), (0x22BF, 0x22BF), (0x2500, 0x254B), (0x2550, 0x2573),
+   (0x2580, 0x258F), (0x2592, 0x2595)]
 
 def ambiguous (n : Nat) : Bool := inRanges n ambiguousRanges
 
 /-- One cell wide or two to Tessera and to terminals, and neither a control nor a format
-character. -/
+character. Text from elsewhere may hold only those that are not `AppOnly`. -/
 def isPrintable (c : Char) : Bool :=
   let n := c.toNat
-  (narrow n || doubleWidth n) && !zeroWidth n
+  (narrow n || doubleWidth n || inRanges n appOnlyRanges) && !zeroWidth n
 
 /-! ## Laws -/
 
