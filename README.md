@@ -45,9 +45,12 @@ def main : IO Unit := discard <| App.run { draw, update } 0
   a file name, a name someone chose) goes through `Untrusted.line` or `Untrusted.lines`, which keep
   characters by an allowlist of those the terminal and Tessera agree on the width of, and show
   anything else as a visible stand-in (`␛` for ESC, `␦` for the rest) so that an attempt to steer
-  the terminal shows. `Untrusted.Ident` is a name that cannot fake a badge, and its `skeleton` and
-  `mixedScript` tell names that look alike. `Untrusted.pasted` removes bracketed paste's markers
-  from a paste, and `withoutControls` takes controls and bidi controls out of text passed on.
+  the terminal shows. The Block Elements (`▀ ▄ █`, U+2580 to U+259F) are for pictures the program
+  draws, such as QR codes: `t!` allows them, and `Untrusted.line` shows them as `␦`, so that text
+  from elsewhere cannot draw what looks like the program's own pictures. `Untrusted.Ident` is a
+  name that cannot fake a badge, and its `skeleton` and `mixedScript` tell names that look alike.
+  `Untrusted.pasted` removes bracketed paste's markers from a paste, and `withoutControls` takes
+  controls and bidi controls out of text passed on.
   [docs/TUI_SECURITY_GUIDELINES.md](docs/TUI_SECURITY_GUIDELINES.md) says what else a TUI showing
   such text should do, and [docs/DESIGN.md](docs/DESIGN.md) how Tessera is built to do it.
 - **The trusted path**: the header, status bar, prompt and sender column of a `Frame` are widgets

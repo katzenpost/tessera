@@ -167,5 +167,11 @@ def tests : TestM Unit := do
   check "filtering never lengthens" (((line (cs := CS) "a\x1b[31mb").text.length ≤ 7))
   checkEq "numbers as text" "1234" (Text.ofNat (cs := CS) 1234).text
   checkEq "app text is drawn as written" ["┌ok┐"] ((str (cs := CS) (o := .app) t!"┌ok┐").draw 4 1).lines
+  checkEq "app text may draw block elements" ["▀▄█ ▐▌"]
+    ((str (cs := CS) (o := .app) t!"▀▄█ ▐▌").draw 6 1).lines
+  checkEq "text from elsewhere may not" "␦␦␦ ␦␦" (line (cs := CS) "▀▄█ ▐▌").text
+  checkEq "block elements are one cell" [1, 1, 1, 1] (['▀', '█', '▐', '▖'].map Charset.standard.width)
+  checkEq "or two in a CJK locale where ambiguous" [2, 2, 1, 1]
+    (['▀', '█', '▐', '▖'].map Charset.cjk.width)
 
 end Tessera.Tests.Untrusted

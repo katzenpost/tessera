@@ -42,6 +42,9 @@ open Tessera Untrusted
 /-- info: 'Tessera.Untrusted.line' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in #print axioms line
 
+/-- info: 'Tessera.Untrusted.line_not_appOnly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in #print axioms line_not_appOnly
+
 /-- info: 'Tessera.Untrusted.filterChars_marksOk' depends on axioms: [propext, Quot.sound] -/
 #guard_msgs in #print axioms filterChars_marksOk
 
